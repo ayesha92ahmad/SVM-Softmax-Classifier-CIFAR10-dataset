@@ -18,6 +18,7 @@ class Svm (object):
         #                       END OF YOUR CODE                                #
         #########################################################################
 
+
     def calLoss (self, x, y, reg):
         """
         Svm loss function
@@ -44,15 +45,18 @@ class Svm (object):
         # Bonus:                                                                    #
         # - +2 points if done without loop                                          #
         #############################################################################
+
         s = x.dot(self.W)
         s_yi = s[np.arange(x.shape[0]),y]
         delta = s- s_yi[:,np.newaxis]+1
-        print(delta.shape)
         loss_i = np.maximum(0,delta)
         loss_i[np.arange(x.shape[0]),y]=0
         loss = np.sum(loss_i)/x.shape[0]
-        dW = self.W-delta
-        return (loss, dW)
+        ds = (delta >0).astype(int)
+        ds[np.arange(x.shape[0]),y] =np.sum(ds,axis=1)-ds[np.arange(x.shape[0]),y]
+        dW = (1/y.shape[0]) * (np.transpose(x)).dot(ds)
+        dW = dW + (2* reg* self.W)
+        return loss, dW
         pass
         #############################################################################
         #                          END OF YOUR CODE                                 #
@@ -100,6 +104,7 @@ class Svm (object):
             xBatch = x[np.random.choice(x.shape[0], batchSize)]
             yBatch = y[np.random.choice(y.shape[0], batchSize)]
             loss, dW = self.calLoss(xBatch,yBatch,reg)
+            self.W= self.W - lr * dW
             lossHistory.append(loss)
             pass
             #########################################################################

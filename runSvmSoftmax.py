@@ -74,7 +74,9 @@ print ('\n######################################################################
 ######################################################################################################
 from svm import Svm
 numClasses = np.max(yTrain) + 1
+
 print ('Start training Svm classifier')
+
 classifier = Svm(xTrain.shape[1], numClasses)
 
 # Show weight for each class before training

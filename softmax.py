@@ -11,8 +11,8 @@ class Softmax (object):
         # - Generate a random softmax weight matrix to use to compute loss.     #
         #   with standard normal distribution and Standard deviation = 0.01.    #
         #########################################################################
-
-
+        sigma =0.01
+        self.W = sigma * np.random.randn(inputDim,outputDim)
         pass
         #########################################################################
         #                       END OF YOUR CODE                                #
@@ -44,12 +44,21 @@ class Softmax (object):
         # Bonus:                                                                    #
         # - +2 points if done without loop                                          #
         #############################################################################
-
-
-
-
-
-
+        #Calculating loss for softmax
+        #calculate the score matrix
+        num_train = x.shape[0]
+        s =x.dot(self.W)
+        # calculating s-max(s)
+        s_ = s-np.max(s, axis=1, keepdims= True)
+        exp_s_ = np.exp(s_)
+        # calculating base
+        sum_f = np.sum(exp_s_, axis=1, keepdims=True)
+        # calculating probability of incorrect label by dividing by base
+        p_yi = exp_s_[np.arange(num_train),list(y)]/sum_f
+        # Calculating loss by applying log over the probability
+        loss_i = - np.log(p_yi)
+        #keep as column vector
+        loss = loss_i + 0.5* reg * np.sum(self.W * self.W)
         pass
         #############################################################################
         #                          END OF YOUR CODE                                 #
@@ -93,8 +102,11 @@ class Softmax (object):
             # Hint:                                                                 #
             # - Use np.random.choice                                                #
             #########################################################################
-
-
+            xBatch = x[np.random.choice(x.shape[0], batchSize)]
+            yBatch = y[np.random.choice(y.shape[0], batchSize)]
+            loss, dW = self.calLoss(xBatch,yBatch,reg)
+            self.W= self.W - lr * dW
+            lossHistory.append(loss)
 
 
 
@@ -148,6 +160,3 @@ class Softmax (object):
         #                           END OF YOUR CODE                              #
         ###########################################################################
         return acc
-
-
-
