@@ -45,7 +45,6 @@ class Svm (object):
         # Bonus:                                                                    #
         # - +2 points if done without loop                                          #
         #############################################################################
-
         s = x.dot(self.W)
         s_yi = s[np.arange(x.shape[0]),y]
         delta = s- s_yi[:,np.newaxis]+1
@@ -54,9 +53,8 @@ class Svm (object):
         loss = np.sum(loss_i)/x.shape[0]
         ds = (delta >0).astype(int)
         ds[np.arange(x.shape[0]),y] =np.sum(ds,axis=1)-ds[np.arange(x.shape[0]),y]
-        dW = (1/y.shape[0]) * (np.transpose(x)).dot(ds)
+        dW = (1/x.shape[0]) * (x.T).dot(ds)
         dW = dW + (2* reg* self.W)
-        return loss, dW
         pass
         #############################################################################
         #                          END OF YOUR CODE                                 #
@@ -132,9 +130,8 @@ class Svm (object):
         # TODO: 5 points                                                          #
         # -  Store the predict output in yPred                                    #
         ###########################################################################
-
-
-
+        s = x.dot(self.W)
+        yPred = np.argmax(s, axis=1)
         pass
         ###########################################################################
         #                           END OF YOUR CODE                              #
@@ -148,9 +145,10 @@ class Svm (object):
         # TODO: 5 points                                                          #
         # -  Calculate accuracy of the predict value and store to acc variable    #
         ###########################################################################
-
-
-
+        yPred = self.predict(x)
+        print(yPred[:40])
+        print(y[:40])
+        acc = np.mean(y == yPred)*100
         pass
         ###########################################################################
         #                           END OF YOUR CODE                              #

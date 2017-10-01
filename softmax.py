@@ -46,7 +46,7 @@ class Softmax (object):
         #############################################################################
         #Calculating loss for softmax
         #calculate the score matrix
-        num_train = x.shape[0]
+        N = x.shape[0]
         s =x.dot(self.W)
         # calculating s-max(s)
         s_ = s-np.max(s, axis=1, keepdims= True)
@@ -54,11 +54,15 @@ class Softmax (object):
         # calculating base
         sum_f = np.sum(exp_s_, axis=1, keepdims=True)
         # calculating probability of incorrect label by dividing by base
-        p_yi = exp_s_[np.arange(num_train),list(y)]/sum_f
+        p_yi = exp_s_[np.arange(N),y]/sum_f
         # Calculating loss by applying log over the probability
         loss_i = - np.log(p_yi)
         #keep as column vector
-        loss = loss_i + 0.5* reg * np.sum(self.W * self.W)
+        loss = np.sum(loss_i)/N
+        ds = (exp_s_ >0).astype(int)
+        ds[np.arange(x.shape[0]),y] += -1
+        dW = (1/x.shape[0]) * (x.T).dot(ds)
+        dW = dW + (2* reg* self.W)
         pass
         #############################################################################
         #                          END OF YOUR CODE                                 #
@@ -114,7 +118,6 @@ class Softmax (object):
             #########################################################################
             #                       END OF YOUR CODE                                #
             #########################################################################
-
             # Print loss for every 100 iterations
             if verbose and i % 100 == 0 and len(lossHistory) is not 0:
                 print ('Loop {0} loss {1}'.format(i, lossHistory[i]))
@@ -136,9 +139,8 @@ class Softmax (object):
         # TODO: 5 points                                                          #
         # -  Store the predict output in yPred                                    #
         ###########################################################################
-
-
-
+        s =x.dot(self.W)
+        yPred = np.argmax(s, axis=1)
         pass
         ###########################################################################
         #                           END OF YOUR CODE                              #
@@ -152,9 +154,10 @@ class Softmax (object):
         # TODO: 5 points                                                          #
         # -  Calculate accuracy of the predict value and store to acc variable    #
         ###########################################################################
-
-
-
+        yPred = self.predict(x)
+        acc = np.mean(y == yPred)*100
+        print(yPred[:40])
+        print(y[:40])
         pass
         ###########################################################################
         #                           END OF YOUR CODE                              #
