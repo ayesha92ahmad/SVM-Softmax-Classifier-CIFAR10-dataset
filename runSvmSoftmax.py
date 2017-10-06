@@ -121,6 +121,8 @@ if classifier.W is not None:
 
 # Tuneup hyper parameters (regularization strength, learning rate) by using validation data set,
 # and random search technique to find the best set of parameters.
+learn_rates = [0.5e-7, 1e-7, 2e-7, 6e-7]
+reg_strengths = [500,5000,18000]
 bestParameters = [0, 0]
 bestAcc = -1
 bestModel = None
@@ -133,16 +135,16 @@ print ('\nFinding best model for Svm classifier')
 # - Store the best model in bestSoftmax                                        #
 # - Store the best accuracy in bestAcc                                         #
 ################################################################################
-
-
-
-
-
-
-
-
-
-
+for rs in reg_strengths:
+    for lr in learn_rates:
+        #print(str(lr)+"     "+str(rs))
+        classifier = Svm(xTrain.shape[1], numClasses)
+        classifier.train(xTrain, yTrain, lr, rs, iter=1500 ,verbose=False)
+        valAcc = classifier.calAccuracy(xVal, yVal)
+        if valAcc > bestAcc:
+            bestAcc = valAcc
+            bestModel = classifier
+        bestParameters = [lr,rs]
 
 pass
 ################################################################################
@@ -211,6 +213,8 @@ if classifier.W is not None:
 
 # Tuneup hyper parameters (regularization strength, learning rate) by using validation data set,
 # and random search technique to find the best set of parameters.
+learn_rates = [0.5e-7,4e-7, 8e-7]
+reg_strengths = [ 500,1500,7500,12000]
 bestParameters = [0, 0]
 bestAcc = -1
 bestModel = None
@@ -222,16 +226,16 @@ print ('\nFinding best model for Softmax classifier')
 # - Store the best model in bestSoftmax                                        #
 # - Store the best accuracy in bestAcc                                         #
 ################################################################################
+for rs in reg_strengths:
+    for lr in learn_rates:
+        classifier = Softmax(xTrain.shape[1], numClasses)
+        classifier.train(xTrain, yTrain, lr, rs, iter=1500 ,verbose=False)
+        valAcc = classifier.calAccuracy(xVal, yVal)
+        if valAcc > bestAcc:
+            bestAcc = valAcc
+            bestModel = classifier
+        bestParameters = [lr,rs]
 
-
-
-
-
-
-
-
-
-pass
 ################################################################################
 #                              END OF YOUR CODE                                #
 ################################################################################

@@ -13,7 +13,6 @@ class Svm (object):
         #########################################################################
         sigma =0.01
         self.W = sigma * np.random.randn(inputDim,outputDim)
-        pass
         #########################################################################
         #                       END OF YOUR CODE                                #
         #########################################################################
@@ -45,17 +44,26 @@ class Svm (object):
         # Bonus:                                                                    #
         # - +2 points if done without loop                                          #
         #############################################################################
+        #Calculating score matrix
         s = x.dot(self.W)
+        #Score with yi
         s_yi = s[np.arange(x.shape[0]),y]
+        #finding the delta
         delta = s- s_yi[:,np.newaxis]+1
+        #loss for samples
         loss_i = np.maximum(0,delta)
         loss_i[np.arange(x.shape[0]),y]=0
         loss = np.sum(loss_i)/x.shape[0]
-        ds = (delta >0).astype(int)
-        ds[np.arange(x.shape[0]),y] =np.sum(ds,axis=1)-ds[np.arange(x.shape[0]),y]
+        #Loss with regularization
+        loss += reg*np.sum(self.W*self.W)
+        #Calculating ds
+        ds = np.zeros_like(delta)
+        ds[delta > 0] = 1
+        ds[np.arange(x.shape[0]),y] = 0
+        ds[np.arange(x.shape[0]),y] = -np.sum(ds, axis=1)
+
         dW = (1/x.shape[0]) * (x.T).dot(ds)
         dW = dW + (2* reg* self.W)
-        pass
         #############################################################################
         #                          END OF YOUR CODE                                 #
         #############################################################################
@@ -98,13 +106,13 @@ class Svm (object):
             # Hint:                                                                 #
             # - Use np.random.choice                                                #
             #########################################################################
-
-            xBatch = x[np.random.choice(x.shape[0], batchSize)]
-            yBatch = y[np.random.choice(y.shape[0], batchSize)]
+            #creating batch
+            num_train = np.random.choice(x.shape[0], batchSize)
+            xBatch = x[num_train]
+            yBatch = y[num_train]
             loss, dW = self.calLoss(xBatch,yBatch,reg)
             self.W= self.W - lr * dW
             lossHistory.append(loss)
-            pass
             #########################################################################
             #                       END OF YOUR CODE                                #
             #########################################################################
@@ -132,7 +140,6 @@ class Svm (object):
         ###########################################################################
         s = x.dot(self.W)
         yPred = np.argmax(s, axis=1)
-        pass
         ###########################################################################
         #                           END OF YOUR CODE                              #
         ###########################################################################
@@ -146,10 +153,7 @@ class Svm (object):
         # -  Calculate accuracy of the predict value and store to acc variable    #
         ###########################################################################
         yPred = self.predict(x)
-        print(yPred[:40])
-        print(y[:40])
         acc = np.mean(y == yPred)*100
-        pass
         ###########################################################################
         #                           END OF YOUR CODE                              #
         ###########################################################################

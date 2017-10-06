@@ -13,7 +13,6 @@ class Softmax (object):
         #########################################################################
         sigma =0.01
         self.W = sigma * np.random.randn(inputDim,outputDim)
-        pass
         #########################################################################
         #                       END OF YOUR CODE                                #
         #########################################################################
@@ -54,16 +53,18 @@ class Softmax (object):
         # calculating base
         sum_f = np.sum(exp_s_, axis=1, keepdims=True)
         # calculating probability of incorrect label by dividing by base
-        p_yi = exp_s_[np.arange(N),y]/sum_f
+        p = exp_s_/sum_f
+        p_yi= p[np.arange(N),y]
         # Calculating loss by applying log over the probability
         loss_i = - np.log(p_yi)
         #keep as column vector
+        #TODO: add regularization
         loss = np.sum(loss_i)/N
-        ds = (exp_s_ >0).astype(int)
+        loss += reg * np.sum(self.W*self.W)
+        ds = p.copy()
         ds[np.arange(x.shape[0]),y] += -1
-        dW = (1/x.shape[0]) * (x.T).dot(ds)
+        dW = (x.T).dot(ds)/N
         dW = dW + (2* reg* self.W)
-        pass
         #############################################################################
         #                          END OF YOUR CODE                                 #
         #############################################################################
@@ -106,15 +107,13 @@ class Softmax (object):
             # Hint:                                                                 #
             # - Use np.random.choice                                                #
             #########################################################################
-            xBatch = x[np.random.choice(x.shape[0], batchSize)]
-            yBatch = y[np.random.choice(y.shape[0], batchSize)]
+            num_train = np.random.choice(x.shape[0], batchSize)
+            xBatch = x[num_train]
+            yBatch = y[num_train]
             loss, dW = self.calLoss(xBatch,yBatch,reg)
             self.W= self.W - lr * dW
             lossHistory.append(loss)
 
-
-
-            pass
             #########################################################################
             #                       END OF YOUR CODE                                #
             #########################################################################
@@ -141,7 +140,6 @@ class Softmax (object):
         ###########################################################################
         s =x.dot(self.W)
         yPred = np.argmax(s, axis=1)
-        pass
         ###########################################################################
         #                           END OF YOUR CODE                              #
         ###########################################################################
@@ -156,9 +154,6 @@ class Softmax (object):
         ###########################################################################
         yPred = self.predict(x)
         acc = np.mean(y == yPred)*100
-        print(yPred[:40])
-        print(y[:40])
-        pass
         ###########################################################################
         #                           END OF YOUR CODE                              #
         ###########################################################################
